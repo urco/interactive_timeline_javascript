@@ -1,5 +1,5 @@
 {
-  "name": "timeline_app",
+  "name": "time_line_app",
   "private": true,
   "scripts": {
     "start": "meteor run"
