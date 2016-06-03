@@ -10,28 +10,37 @@
   
   <main class="container">
       <div class="row">
+        {{> seasons}}
         <div  id="visualization"></div> <!-- container visualization -->
-      </div> 
-      {{> episodes}} 
+        </div> 
+      {{> content}}
   </main>
   
   <footer>
   </footer>
-
 </body>
 
-<template name="visualization">
-</template>
 
- <template name="listSeasonsEpisodes">
-    
+ <template name="seasons">
+   <!-- probando Jquery <input type="text" value="ff" class="texto">-->
+
+    <select class="js-select-season">  
+    {{#each get_seasons}}
+      <option value="{{season}}">Season {{season}}</option>
+    {{/each}}
+    </select>
+
+    <select class="js-select-episodes">  
+     {{#each get_episodes}}
+    <option value="{{number}}">Episode {{name}}</option>
+    {{/each}}
+    </select>
  </template>
 
 
- <template name="episodes">
+ <template name="content">
  <h3>en esta plantilla se deberian de ver los nombres de los episodios</h3>
-  <ul>
-  {{#each get_episodes}}
+  {{#each get_content}}
     <p>
     {{number}}
     {{name}}
@@ -42,6 +51,5 @@
     {{summary}}
     </div>
   {{/each}}
-  </ul>
  </template>
 
