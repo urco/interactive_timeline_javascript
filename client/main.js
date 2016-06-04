@@ -5,77 +5,16 @@ import './main.html';
 
 
 
-// this variable will store the visualisation so we can delete it when we need to 
-
   Meteor.subscribe('Shows');
-  
-  Template.seasons.helpers({
 
-    get_seasons : function(){
-      var seasons_aux = [];
-      var seasons = [];
-      var episodes_a = []; 
 
-       shows = Shows.findOne(); 
-
-      if (shows != undefined) {
-        var episodes = shows._embedded.episodes.length;
-        
-        for (var i=0;i < episodes;i++){
-            episodes_a[i] = shows._embedded.episodes[i];
-            season = episodes_a[i].season;
-            seasons.push(season); 
-          }
-        var counterSeasons = Math.max.apply(Math, seasons); 
-        //console.log('numero de temporadas' + counterSeasons);
-          for (var g = 1; g <= counterSeasons; g++) {
-             seasons_aux[g] = {season:g}
-          } 
-         return seasons_aux;  
-      }
-     },
-
-     get_episodes: function(){
-      var episodesbySeason = [];
-      var episodes_aux = [];
-     
-
-      $(document).ready(function(){
-       $('.js-select-season').change(function() {
-         seasonSelected = $('.js-select-season option:selected').val();
-         episodes_aux = [];
-          shows = Shows.findOne(); 
-
-          if (shows != undefined){
-             var episodes = shows._embedded.episodes.length;
-             console.log("Season Selected" + seasonSelected);
-            for (var i=0;i < episodes;i++){
-              episodesbySeason[i] = shows._embedded.episodes[i];
-              if (episodesbySeason[i].season == seasonSelected){
-                 episodes_aux.push(episodesbySeason[i]);
-              }
-            }
-
-            console.log(episodes_aux.length);
-            console.log(episodes_aux);
-            return episodes_aux; 
-          }  
-        });  
-      }); //end document ready 
-     }
-  });
-  
-  Template.content.helpers ({
-    // returns an array of the names of all features of the requested type
-    get_content : function(){
-      // pull an example song from the database
-      // - we'll use this to find the names of all the single features
+  // Functions 
+function timeline() {
        var visjsobj;
        var episodes_a = []; 
        // create a data set with groups
        var seasons = [];
        var seassonsAux = 0 ;
-      
       shows = Shows.findOne(); 
 
       if (shows != undefined) {// looks good! 
@@ -145,6 +84,84 @@ import './main.html';
         return [];
 
       }
-    }
+
+}
+
+ function getSeasons(){  
+      var seasons_aux = [];
+      var seasons = [];
+      var episodes_a = []; 
+      shows = Shows.findOne();
+
+      if (shows != undefined) {
+        var episodes = shows._embedded.episodes.length;
+        
+        for (var i=0;i < episodes;i++){
+            episodes_a[i] = shows._embedded.episodes[i];
+            season = episodes_a[i].season;
+            seasons.push(season); 
+          }
+        var counterSeasons = Math.max.apply(Math, seasons); 
+        
+          for (var g = 1; g <= counterSeasons; g++) {
+             seasons_aux[g] = {season:g}
+          } 
+         //console.log(seasons_aux);
+         return seasons_aux; 
+        
+      }
+} 
+
+  function getEpisodes(){
+      var episodesbySeason = [];
+      var episodes_aux = [];
+      shows = Shows.findOne();
+
+      seasonSelected = $('.js-select-season option:selected').val();
+      episodes_aux = [];
+      $('.js-select-episodes').empty();
+      
+          if (shows != undefined){
+             var episodes = shows._embedded.episodes.length;
+             console.log("Season Selected" + seasonSelected);
+            for (var i=0;i < episodes;i++){
+              episodesbySeason[i] = shows._embedded.episodes[i];
+              if (episodesbySeason[i].season == seasonSelected){
+                 episodes_aux.push(episodesbySeason[i]);
+                 $('.js-select-episodes').append('<option value="' + episodesbySeason[i].id + '">' + episodesbySeason[i].name  + '</option>');
+              }
+            }
+
+            console.log('esto cambia');
+            console.log(episodes_aux);
+            return episodes_aux; 
+          }  
+  }
+
+
+////////////////////////////
+
+  Template.seasons.helpers({
+
+    get_seasons : function(){
+      return getSeasons();
+     }
+  });
+  
+  Template.content.helpers ({
+    
+    get_content : function(){
+        return timeline();
+      }
 });
-   
+
+
+  ///////////////////////////////////Events
+
+ 
+   Template.seasons.events({
+    'change .js-select-season':function(event){
+      getEpisodes();
+    }
+
+   });
