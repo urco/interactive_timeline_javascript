@@ -6,37 +6,31 @@ import './main.html';
 
 
   Meteor.subscribe('Shows');
-
-
+  var timeline;
   // Functions 
-function timeline() {
-       var visjsobj;
-       var episodes_a = []; 
-       // create a data set with groups
-       var seasons = [];
-       var seassonsAux = 0 ;
-      shows = Shows.findOne(); 
+function drawTimeline(episodes) {
+      
+
+      if (timeline != undefined) {
+        console.log('a timeline already exists');
+        timeline.destroy();
+      } 
+
+       var episodes_a = episodes; 
+       var group = $('.js-select-season option:selected').val();
+       console.log(episodes);
+       shows = Shows.findOne(); 
 
       if (shows != undefined) {// looks good! 
-        // get an array of all the song feature names 
-        // (an array of strings)
-        console.log("hay datos");
-        var episodes = shows._embedded.episodes.length;
-        
-        
+       var episodes_aux = episodes_a.length;  
        //create items dataset
        var items = new vis.DataSet();
 
-         //collecting episodes/items 
-          
-        for (var i=0;i < episodes;i++){
-
-            episodes_a[i] = shows._embedded.episodes[i];
-            season = episodes_a[i].season;
-            seasons.push(season); 
-
+         //collecting episodes/items     
+        for (var i=0; i < episodes_aux; i++){
+           console.log('temporada' + episodes_a[i].season);
             items.add({
-                group:season,
+                group:group,
                 content: 'Episode ' + episodes_a[i].number +
           ' <span>' + episodes_a[i].name + '</span>',//episodes_a[i].name + '.' + '<span>Episode</span>' + episodes_a[i].number + '<span>,Season</span>' + episodes_a[i].season,
                 start:   episodes_a[i].start
@@ -44,47 +38,32 @@ function timeline() {
           }
         
      // new dataset for groups
-
-        var groups = new vis.DataSet();
-        var counterSeasons = Math.max.apply(Math, seasons); 
-        //console.log('numero de temporadas' + counterSeasons);
-          for (var g = 1; g <= counterSeasons; g++) {
-            //var gAux = g +1;
+        var groups = new vis.DataSet(); 
             groups.add({ //loading data group
-              id: g, 
-              value: g,
-              content:'<span>SEASON</span>' + g});
-          }
-          //console.log(groups);
-        //create VIS object. Timeline vis.js
-      
-        if (visjsobj != undefined){
-          visjsobj.destroy();
-        }
+              id:group, 
+              value: group,
+              content:'<span>SEASON</span>' + group
+            });
+
         var options = {
                type:'point',
-               showMajorLabels: false,
+               showMajorLabels: true,
                start:'2011',
                end:'2017',
                autoResize:true,
                min:'2011'
           };
-       
-        var container = document.getElementById('visualization');
-        //var timeline = new vis.Timeline(container, groups, items, options);
-        var timeline = new vis.Timeline(container);
-        timeline.setOptions(options);
-        timeline.setGroups(groups);
-        timeline.setItems(items);
-        timeline.fit();
-        return episodes_a; 
 
+        var container = document.getElementById('visualization');
+        timeline = new vis.Timeline(container, items, groups, options);
+        /*timeline.setOptions(options);
+        timeline.setGroups(groups);
+        timeline.setItems(items);*/
+        timeline.fit();  
       }
       else {
         return [];
-
       }
-
 }
 
  function getSeasons(){  
@@ -106,7 +85,6 @@ function timeline() {
           for (var g = 1; g <= counterSeasons; g++) {
              seasons_aux[g] = {season:g}
           } 
-         //console.log(seasons_aux);
          return seasons_aux; 
         
       }
@@ -123,7 +101,7 @@ function timeline() {
       
           if (shows != undefined){
              var episodes = shows._embedded.episodes.length;
-             console.log("Season Selected" + seasonSelected);
+             console.log("Season selected " + seasonSelected);
             for (var i=0;i < episodes;i++){
               episodesbySeason[i] = shows._embedded.episodes[i];
               if (episodesbySeason[i].season == seasonSelected){
@@ -132,8 +110,6 @@ function timeline() {
               }
             }
 
-            console.log('esto cambia');
-            console.log(episodes_aux);
             return episodes_aux; 
           }  
   }
@@ -149,19 +125,16 @@ function timeline() {
   });
   
   Template.content.helpers ({
-    
-    get_content : function(){
-        return timeline();
+    get_content : function(){  
+      return getEpisodes();    
       }
 });
 
-
   ///////////////////////////////////Events
 
- 
    Template.seasons.events({
     'change .js-select-season':function(event){
-      getEpisodes();
-    }
-
+     event.preventDefault();
+     drawTimeline(getEpisodes());
+      }
    });
