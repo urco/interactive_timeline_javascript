@@ -5,20 +5,23 @@ import './main.html';
 
 
 
-  Meteor.subscribe('Shows');
-  var timeline;
+Meteor.subscribe('Shows');
+var timeline;
+var content = {
+  get_content : function() {  
+      return getEpisode(getEpisodes());
+      }
+  }
   // Functions 
 function drawTimeline(episodes) {
       
 
       if (timeline != undefined) {
-        console.log('a timeline already exists');
         timeline.destroy();
       } 
 
        var episodes_a = episodes; 
        var group = $('.js-select-season option:selected').val();
-       console.log(episodes);
        shows = Shows.findOne(); 
 
       if (shows != undefined) {// looks good! 
@@ -28,7 +31,7 @@ function drawTimeline(episodes) {
 
          //collecting episodes/items     
         for (var i=0; i < episodes_aux; i++){
-           console.log('temporada' + episodes_a[i].season);
+           //console.log('temporada' + episodes_a[i].season);
             items.add({
                 group:group,
                 content: 'Episode ' + episodes_a[i].number +
@@ -84,6 +87,7 @@ function drawTimeline(episodes) {
         
           for (var g = 1; g <= counterSeasons; g++) {
              seasons_aux[g] = {season:g}
+             $('.js-select-season').append('<option value="' + g + '">' + 'Season' + g + '</option>');
           } 
          return seasons_aux; 
         
@@ -94,9 +98,10 @@ function drawTimeline(episodes) {
       var episodesbySeason = [];
       var episodes_aux = [];
       shows = Shows.findOne();
-
+      
       seasonSelected = $('.js-select-season option:selected').val();
-      episodes_aux = [];
+      
+
       $('.js-select-episodes').empty();
       
           if (shows != undefined){
@@ -107,34 +112,65 @@ function drawTimeline(episodes) {
               if (episodesbySeason[i].season == seasonSelected){
                  episodes_aux.push(episodesbySeason[i]);
                  $('.js-select-episodes').append('<option value="' + episodesbySeason[i].id + '">' + episodesbySeason[i].name  + '</option>');
+                 
               }
             }
-
             return episodes_aux; 
           }  
   }
 
 
-////////////////////////////
+ function getEpisode(episodes){
+   var episodes_aux = [];   
+   var sizeEpisodes;
+   var episode;
+   var episodeSelected;
+   var episodeTemp;
+
+   shows = Shows.findOne();
+
+  if (shows != undefined) {
+    episodes_aux = episodes;
+    sizeEpisodes = episodes_aux.length;
+    $('.js-select-episodes option:first').attr('selected','selected'); 
+    episodeSelected = $('.js-select-episodes option:selected').val(); 
+
+      console.log(episodes_aux);
+      console.log(sizeEpisodes);
+      for (var i = 0; i < sizeEpisodes; i++){
+
+         if (episodes_aux[i].id == episodeSelected){
+            console.log("el nombre del capitulo elegido es " + episodes_aux[i].name);
+            episodeTemp = episodes_aux[i];    
+         }
+      } //end for
+       console.log(episodeTemp);
+       return episodeTemp;
+    }
+ } 
+  //Helpers
 
   Template.seasons.helpers({
-
     get_seasons : function(){
-      return getSeasons();
+      getSeasons();
+      drawTimeline(getEpisodes());
      }
   });
   
   Template.content.helpers ({
-    get_content : function(){  
-      return getEpisodes();    
+    get_content : function() {  
+      return getEpisode(getEpisodes());
       }
-});
+  });
 
-  ///////////////////////////////////Events
+
+  //Events
 
    Template.seasons.events({
     'change .js-select-season':function(event){
      event.preventDefault();
      drawTimeline(getEpisodes());
+     getEpisode(getEpisodes());
+
       }
    });

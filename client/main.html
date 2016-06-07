@@ -13,7 +13,7 @@
         {{> seasons}}
         <div  id="visualization"></div> <!-- container visualization -->
         </div> 
-      {{> content}}
+        {{> content}}
   </main>
   
   <footer>
@@ -22,7 +22,6 @@
 
 
  <template name="seasons">
-   <!-- probando Jquery <input type="text" value="ff" class="texto">-->
 
     <select class="js-select-season">  
     {{#each get_seasons}}
@@ -37,17 +36,17 @@
 
 
  <template name="content">
- <h3>en esta plantilla se deberian de ver los nombres de los episodios</h3>
-  {{#each get_content}}
-    <p>
-    {{number}}
-    {{name}}
-    <span><strong>{{start}}</strong></span>
-    </p>
-    <img class="responsive" src={{image.original}}>
-    <div>
-    {{summary}}
-    </div>
-  {{/each}}
+   <h3 class="text-center">Aquí se debería ver el capitulo seleccionado</h3>
+    {{#with get_content}}
+         <p>
+          {{number}}
+          {{name}}
+          <span><strong>{{start}}</strong></span>
+        </p>
+        <img class="responsive" src={{image.original}}>
+        <div>
+          {{summary}}
+        </div>
+    {{/with}}
  </template>
 
