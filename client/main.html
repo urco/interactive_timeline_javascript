@@ -10,17 +10,16 @@
   
   <main class="container">
       <div class="row">
-        {{> seasons}}
-        <div  id="visualization"></div> <!-- container visualization -->
+        <!--{{> seasons}}-->
+                {{> content}}
         </div> 
-        {{> content}}
   </main>
   
   <footer>
   </footer>
 </body>
 
-
+<!--
  <template name="seasons">
 
     <select class="js-select-season">  
@@ -32,12 +31,22 @@
     <select class="js-select-episodes">  
     <option value="{{number}}">Episode {{name}}</option>
     </select>
- </template>
+ </template>-->
 
 
  <template name="content">
    <h3 class="text-center">Aquí se debería ver el capitulo seleccionado</h3>
-    {{#with get_content}}
+  
+    <select class="js-select-season">  
+    {{#each get_seasons}}
+      <option value="{{season}}">Season {{season}}</option>
+    {{/each}}
+    </select>
+    
+    <select class="js-select-episodes">  
+      <option value="{{number}}">Episode {{name}}</option>
+    </select>
+   {{#with get_content}}
          <p>
           {{number}}
           {{name}}
@@ -48,5 +57,7 @@
           {{summary}}
         </div>
     {{/with}}
+  <div  id="visualization"></div> <!-- container visualization -->
+
  </template>
 
