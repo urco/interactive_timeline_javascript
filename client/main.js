@@ -6,14 +6,18 @@ import './main.html';
 
 
 Meteor.subscribe('Shows');
+var item1;
 var timeline;
-
+var variable = new ReactiveVar(); //storage JSON object episode
+var var_episode = new ReactiveVar();
   // Functions 
 function drawTimeline(episodes) {
       
       if (timeline != undefined) {
         timeline.destroy();
+
       } 
+
        var episodes_a = episodes; 
        var group = $('.js-select-season option:selected').val();
        shows = Shows.findOne(); 
@@ -46,7 +50,9 @@ function drawTimeline(episodes) {
                showMajorLabels: true,
                start:'2011',
                end:'2017',
-               autoResize:true,
+               autoResize:false,
+               width: '100%',
+               height: '32rem',
                min:'2011',
                editable: true
 
@@ -54,15 +60,18 @@ function drawTimeline(episodes) {
 
         var container = document.getElementById('visualization');
         timeline = new vis.Timeline(container, items, groups, options);
-        timeline.fit();  
-
-        // Events timeline nodes
+        timeline.fit({animate:false});  
+        
+      
+// Events timeline nodes
 
           timeline.on('select', function (event, properties, senderId) {
-            var item1 = timeline.getSelection();
-            console.log('item', item1);
-            //Template.instance().var_episode.set(item1);
+            item1 = timeline.getSelection();
+            $('.js-select-episodes').val(item1[0]).attr('selected','selected');
+            variable.set(getEpisode(getEpisodes()));
+            console.log($('.js-select-episodes').val());
         });
+        timeline.setSelection(item1);
       }
       else {
         return [];
@@ -129,14 +138,10 @@ function drawTimeline(episodes) {
   if (shows != undefined) {
     episodes_aux = episodes;
     sizeEpisodes = episodes_aux.length;
-
-    // I choose the episode selected in dropdownlist to show the right episode content
-    //EN ESTA LIENA ESTA EL FALLO! Hacer JQUERY para cambiar dinamicamente  los valores el capituloo
-    //en el timeline y asignarselos a los droplist
-    Template.instance().var_episode.set($('.js-select-episodes option:selected').val()); 
-    
+    //EN ESTA LIENA ESTA EL FALLO! Hacer JQUERY para cambiar dinamicamente  los valores el capitulo
+    var_episode.set($('.js-select-episodes option:selected').val()); 
       for (var i = 0; i < sizeEpisodes; i++){
-         if (episodes_aux[i].id == Template.instance().var_episode.get()){
+         if (episodes_aux[i].id == var_episode.get()){
             episodeTemp = episodes_aux[i];    
          }
       } //end for
@@ -147,20 +152,24 @@ function drawTimeline(episodes) {
   //Helpers
   
 Template.content.onCreated(function(){
-  this.variable = new ReactiveVar(); //storage JSON object episode
-  this.var_episode = new ReactiveVar(); //storage the number of the episode 
+ /* this.variable = new ReactiveVar(); //storage JSON object episode
+  this.var_episode = new ReactiveVar(); //storage the JSON of the episode */
 
 });
 
+  
+Template.content.rendered = function (){
+  console.log('se ve');
+}
+
 Template.content.helpers ({
       get_content : function() {
-        Template.instance().variable.set(getEpisode(getEpisodes()))
-        console.log(Template.instance().variable.get());
-        return Template.instance().variable.get();
+        variable.set(getEpisode(getEpisodes())); //Initialize the value in the first page load
+        drawTimeline(getEpisodes()); //Draw the interactive timeline
+        return variable.get();//return the episode selected
       },
       get_seasons : function(){
-        getSeasons();
-        drawTimeline(getEpisodes());
+        getSeasons(); //Return the available seasons
      }
   });
 
@@ -169,13 +178,13 @@ Template.content.helpers ({
     'change .js-select-season':function(event, template){
        event.preventDefault();
        $('.js-select-episodes').empty();
-       drawTimeline(getEpisodes());
-       Template.instance().variable.set(getEpisode(getEpisodes()));
+       //drawTimeline(getEpisodes());
+      variable.set(getEpisode(getEpisodes()));
       },
 
       'change .js-select-episodes':function(event, template){
        event.preventDefault();
-       Template.instance().variable.set(getEpisode(getEpisodes()));
+       variable.set(getEpisode(getEpisodes()));
 
       }
    });
