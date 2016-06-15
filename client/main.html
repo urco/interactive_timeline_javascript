@@ -44,7 +44,9 @@
     </select>
     
     <select class="js-select-episodes">  
-      <option value="{{number}}">Episode {{name}}</option>
+      {{#each get_episodes}}
+      <option value="{{number}}">{{name}}</option>
+      {{/each}}
     </select>
    {{#with get_content}}
          <p>
