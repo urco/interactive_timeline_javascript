@@ -6,10 +6,12 @@ import './main.html';
 
 
 Meteor.subscribe('Shows');
-var item1;
+
+
 var timeline;
 var variable = new ReactiveVar(); //storage JSON object episode
 var var_episode = new ReactiveVar();
+var item1 = new ReactiveVar();//storage the item selected in timeline
   // Functions 
 function drawTimeline(episodes) {
       
@@ -69,9 +71,9 @@ function drawTimeline(episodes) {
             item1 = timeline.getSelection();
             $('.js-select-episodes').val(item1[0]).attr('selected','selected');
             variable.set(getEpisode(getEpisodes()));
-            console.log($('.js-select-episodes').val());
+            console.log(item1[0]);
         });
-        timeline.setSelection(item1);
+        timeline.setSelection(item1[0]);
       }
       else {
         return [];
@@ -165,6 +167,8 @@ Template.content.rendered = function (){
 Template.content.helpers ({
       get_content : function() {
         variable.set(getEpisode(getEpisodes())); //Initialize the value in the first page load
+                item1[0] = $('.js-select-episodes option:selected').val();
+
         drawTimeline(getEpisodes()); //Draw the interactive timeline
         return variable.get();//return the episode selected
       },
@@ -184,8 +188,11 @@ Template.content.helpers ({
 
       'change .js-select-episodes':function(event, template){
        event.preventDefault();
-       variable.set(getEpisode(getEpisodes()));
-
+        variable.set(getEpisode(getEpisodes()));
+        //aqui progdramar el combobox para que seleccione el capitulo
+        item1[0] = $('.js-select-episodes option:selected').val();
+        //timeline.setSelection($('.js-select-episodes option:selected').val());
+        console.log(item1[0]);
       }
    });
  
